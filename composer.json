@@ -1,0 +1,17 @@
+{
+    "name": "om0x01/bankingapp",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "BankingApp\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "OmarFaruk-0x01",
+            "email": "programmer.omar.dev@gmail.com"
+        }
+    ],
+    "require": {
+    }
+}
