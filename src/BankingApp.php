@@ -5,6 +5,7 @@ namespace BankingApp;
 use BankingApp\Feature\AddDeposit;
 use BankingApp\Feature\Feature;
 use BankingApp\Feature\Login;
+use BankingApp\Feature\Logout;
 use BankingApp\Feature\Register;
 use BankingApp\Management\Management;
 use BankingApp\Management\Managers\AccountsManager;
@@ -32,7 +33,7 @@ class BankingApp
     {
         $this->storage = new FileStorage();
         $this->management = $this->loadManagement($this->storage);
-        $this->authenticationState = new AuthenticationState($this->management->getAccountsManager());
+        $this->authenticationState = $this->loadAuthState();
         $this->view = new ConsoleView($this->authenticationState, $this->management);
         $this->loadFeatures();
     }
@@ -45,7 +46,11 @@ class BankingApp
                 $runningFeature = $this->features[$this->authenticationState->getUser()->getRole()->name];
                 $this->view->preRender();
                 $this->view->renderHeader();
-
+                if ($this->authenticationState->isFirstRun() && $this->authenticationState->isLoggedIn()){
+                    $password = $this->view->inputWithValidation("Password: ", fn ($input) => strlen($input) < 4, "Minimum 4 character!!");
+                    $this->authenticationState->reLogin($password);
+                    continue;
+                }
                 $this->view->renderList($runningFeature, fn ($feature, $key) => "$key. $feature".PHP_EOL);
                 $inp = (int) $this->view->inputWithValidation("Enter Option: ",
                     fn ($input) => !array_key_exists($input, $runningFeature));
@@ -53,10 +58,10 @@ class BankingApp
                 $runningFeature[$inp]->run();
                 $runningFeature[$inp]->postRun();
 
-                $this->view->getInput("Press ENTER Key to Continue");
             }catch (\Exception $err){
-                $this->view->renderMessage($err->getMessage(), MessageType::Failed);
+                $this->view->renderMessage($err->getMessage().PHP_EOL, MessageType::Failed);
             }
+            $this->view->getInput("Press ENTER Key to Continue");
         }
     }
 
@@ -67,6 +72,7 @@ class BankingApp
         $this->loadFeature([Role::GUEST],2, Register::class);
 
         $this->loadFeature([Role::CUSTOMER],1, AddDeposit::class);
+        $this->loadFeature([Role::CUSTOMER, Role::ADMIN],9, Logout::class);
     }
     private function loadFeature(array $roles, int $key, string $featureClass): void
     {
@@ -79,5 +85,9 @@ class BankingApp
         $financeManager = $this->storage->load(FinanceManager::class) ?? new FinanceManager($storage);
         $accountsManager = $this->storage->load(AccountsManager::class) ?? new AccountsManager($storage);
         return new Management($financeManager, $accountsManager);
+    }
+
+    private function loadAuthState(): AuthenticationState {
+        return $this->storage->load(AuthenticationState::class) ?? new AuthenticationState($this->management->getAccountsManager());
     }
 }

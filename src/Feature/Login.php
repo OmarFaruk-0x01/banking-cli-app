@@ -3,6 +3,7 @@
 namespace BankingApp\Feature;
 
 use BankingApp\Feature\Feature;
+use BankingApp\State\AuthenticationState;
 
 class Login extends Feature
 {
@@ -26,5 +27,6 @@ class Login extends Feature
                 fn ($input) => strlen($input) < 4, 'Minimum 4 character!!');
 
         $this->authenticationState->login($email, $password);
+        $this->storage->write(AuthenticationState::class, $this->authenticationState);
     }
 }

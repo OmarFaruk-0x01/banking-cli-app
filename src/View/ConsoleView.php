@@ -30,8 +30,8 @@ readonly class ConsoleView implements View
         }else{
             $this->renderBar();
             printf("Name    : {$this->state->getUser()->getName()}".PHP_EOL);
-            printf("Email   : {$this->state->getUser()->getEmail()}".PHP_EOL);
-            printf("Balance : {$this->state->getUser()->getCurrentBalance()}".PHP_EOL);
+            printf("Email   : %s".PHP_EOL, $this->state->isFirstRun() ? $this->hideEmail($this->state->getUser()->getEmail()) : $this->state->getUser()->getEmail());
+            printf("Balance : %s".PHP_EOL, $this->state->isFirstRun() ? "****" : $this->state->getUser()->getCurrentBalance());
             $this->renderBar();
         }
     }
@@ -68,4 +68,10 @@ readonly class ConsoleView implements View
         }
         return $input;
     }
+
+    private function hideEmail(string $email): string {
+        $username = explode("@", $email)[0];
+
+        return str_replace(join('', array_slice(str_split($username), 0, strlen($username) - 2)), "****", $email);
+}
 }
