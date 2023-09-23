@@ -2,8 +2,6 @@
 
 namespace BankingApp\Model;
 
-use mysql_xdevapi\DatabaseObject;
-
 abstract class Transaction
 {
     protected User $user;
@@ -34,7 +32,7 @@ abstract class Transaction
     }
 
     public function getDate(): string {
-        return date("Y-m-d H:i:s", $this->timestamp);
+        return date("M, d Y h:i:s a", $this->timestamp);
     }
     public function __toString(): string
     {

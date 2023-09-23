@@ -4,6 +4,7 @@ namespace BankingApp\Feature;
 
 use BankingApp\Feature\Feature;
 use BankingApp\State\AuthenticationState;
+use BankingApp\View\MessageType;
 
 class Login extends Feature
 {
@@ -28,5 +29,7 @@ class Login extends Feature
 
         $this->authenticationState->login($email, $password);
         $this->storage->write(AuthenticationState::class, $this->authenticationState);
+
+        $this->view->renderMessage(PHP_EOL."Welcome Back!!".PHP_EOL);
     }
 }

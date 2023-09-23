@@ -4,7 +4,7 @@
 require_once "vendor/autoload.php";
 
 $db = new \BankingApp\Storage\FileStorage();
-$accountManager = $db->load(\BankingApp\Management\Managers\AccountsManager::class);
+$accountManager = $db->load(\BankingApp\Management\Managers\AccountsManager::class) ?? new \BankingApp\Management\Managers\AccountsManager($db);
 
 $name = readline("Name: ");
 $email = readline("Email: ");

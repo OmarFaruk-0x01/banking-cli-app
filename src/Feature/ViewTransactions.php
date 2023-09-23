@@ -63,7 +63,7 @@ class ViewTransactions extends Feature
         if (count($transfers) > 0){
             printf("Transfers: ".PHP_EOL);
             $this->view->renderList($transfers,
-                fn ($transfers, $index) => sprintf("%s. $transfers => {$transfers->getUser()}".PHP_EOL, $index + 1),true);
+                fn ($transfers, $index) => sprintf("%s. $transfers => {$transfers->getUserTo()}".PHP_EOL, $index + 1),true);
             printf(PHP_EOL);
         }
     }

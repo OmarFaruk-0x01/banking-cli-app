@@ -27,5 +27,7 @@ class Register extends Feature
             fn ($input) => strlen($input) < 4, 'Minimum 4 character!!');
 
         $this->authenticationState->register($name, $email, $password);
+
+        $this->view->renderMessage(PHP_EOL."Thank You For register.".PHP_EOL);
     }
 }

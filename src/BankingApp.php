@@ -9,7 +9,8 @@ use BankingApp\Feature\Logout;
 use BankingApp\Feature\Register;
 use BankingApp\Feature\Transfer;
 use BankingApp\Feature\ViewTransactions;
-use BankingApp\Feature\ViewUsers;
+use BankingApp\Feature\ViewTransactionsByUser;
+use BankingApp\Feature\ViewCustomers;
 use BankingApp\Feature\Withdraw;
 use BankingApp\Management\Management;
 use BankingApp\Management\Managers\AccountsManager;
@@ -40,6 +41,8 @@ class BankingApp
         $this->authenticationState = $this->loadAuthState();
         $this->view = new ConsoleView($this->authenticationState, $this->management);
         $this->loadFeatures();
+        $this->registerTimeZone();
+
     }
 
 
@@ -51,7 +54,11 @@ class BankingApp
                 $this->view->preRender();
                 $this->view->renderHeader();
                 if ($this->authenticationState->isFirstRun() && $this->authenticationState->isLoggedIn()){
-                    $password = $this->view->inputWithValidation("Password: ", fn ($input) => strlen($input) < 4, "Minimum 4 character!!");
+                    $password = $this->view->getInput("[L]ogout / Password: ");
+                    if ($password == "L"){
+                        $this->authenticationState->logout();
+                        continue;
+                    }
                     $this->authenticationState->reLogin($password);
                     continue;
                 }
@@ -79,10 +86,11 @@ class BankingApp
         $this->loadFeature([2 => Role::CUSTOMER], Withdraw::class);
         $this->loadFeature([3 => Role::CUSTOMER], Transfer::class);
 
-        $this->loadFeature([1 => Role::ADMIN], ViewUsers::class);
+        $this->loadFeature([1 => Role::ADMIN], ViewCustomers::class);
+        $this->loadFeature([2 => Role::ADMIN], ViewTransactionsByUser::class);
 
-        $this->loadFeature([4 => Role::CUSTOMER, 2 => Role::ADMIN], ViewTransactions::class);
-        $this->loadFeature([5 => Role::CUSTOMER, 3 => Role::ADMIN], Logout::class);
+        $this->loadFeature([4 => Role::CUSTOMER, 3 => Role::ADMIN], ViewTransactions::class);
+        $this->loadFeature([5 => Role::CUSTOMER, 4 => Role::ADMIN], Logout::class);
     }
 
     private function loadFeature(array $roles, string $featureClass): void
@@ -101,5 +109,10 @@ class BankingApp
 
     private function loadAuthState(): AuthenticationState {
         return $this->storage->load(AuthenticationState::class) ?? new AuthenticationState($this->management->getAccountsManager());
+    }
+
+    private function registerTimeZone(string $zone = "Asia/Dhaka"): void
+    {
+        date_default_timezone_set($zone);
     }
 }
