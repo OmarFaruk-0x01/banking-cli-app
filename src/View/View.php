@@ -13,10 +13,10 @@ interface View
 
     /**
      * @param array $list
-     * @param \Closure<string> $callback
+     * @param Callable $callback
      * @return void
      */
-    public function renderList(array $list, \Closure $callback): void;
+    public function renderList(array $list, Callable $callback, bool $withIndex): void;
 
     public function getInput(string $placeholder): string;
 

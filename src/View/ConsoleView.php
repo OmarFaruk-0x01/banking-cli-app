@@ -31,7 +31,7 @@ readonly class ConsoleView implements View
             $this->renderBar();
             printf("Name    : {$this->state->getUser()->getName()}".PHP_EOL);
             printf("Email   : %s".PHP_EOL, $this->state->isFirstRun() ? $this->hideEmail($this->state->getUser()->getEmail()) : $this->state->getUser()->getEmail());
-            printf("Balance : %s".PHP_EOL, $this->state->isFirstRun() ? "****" : $this->state->getUser()->getCurrentBalance());
+            printf("Balance : %s".PHP_EOL, $this->state->isFirstRun() ? "****" : $this->management->getFinanceManager()->getBalanceByUser($this->state->getUser()));
             $this->renderBar();
         }
     }
@@ -47,10 +47,12 @@ readonly class ConsoleView implements View
     }
 
 
-    public function renderList($list, $callback): void
+    public function renderList($list, $callback, $withIndex = false): void
     {
+        $i = 0;
         foreach ($list as $key => $item) {
-            $this->renderMessage($callback($item, $key));
+            $this->renderMessage($callback($item, $withIndex ? $i : $key));
+            $i++;
         }
     }
 

@@ -5,13 +5,14 @@ namespace BankingApp\State;
 use BankingApp\Management\Managers\AccountsManager;
 use BankingApp\Model\Role;
 use BankingApp\Model\User;
+use BankingApp\Storage\FileStorage;
 
 class AuthenticationState
 {
     private User|null $user;
     private bool $isFirstRun;
     private bool $isAuthenticated;
-    public function __construct(private readonly AccountsManager $accountsManager)
+    public function __construct(private AccountsManager $accountsManager)
     {
         $this->user = new User("Guest", "", "", Role::GUEST);
         $this->isAuthenticated = false;
@@ -101,6 +102,7 @@ class AuthenticationState
     public function __wakeup(): void
     {
         $this->isFirstRun = true;
+        $this->accountsManager = (new FileStorage())->load(AccountsManager::class);
     }
 
 }

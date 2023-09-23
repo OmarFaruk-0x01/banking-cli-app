@@ -7,11 +7,17 @@ use BankingApp\Model\Transaction;
 class Transfer extends Transaction
 {
     public function __construct(
-        private User $user,
-        private Money $money,
-        private User $userTo
+        protected User $user,
+        protected Money $money,
+        protected User $userTo
     )
     {
+        $this->timestamp = time();
+    }
+
+    public function getTransactionType(): TransactionTypes
+    {
+        return TransactionTypes::TRANSFER;
     }
 
     /**

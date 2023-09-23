@@ -70,4 +70,9 @@ class User
     {
         $this->currentBalance->setAmount($this->currentBalance->getAmount() - $money->getAmount());
     }
+
+    public function __toString(): string
+    {
+        return "{$this->name} [{$this->email}]";
+    }
 }

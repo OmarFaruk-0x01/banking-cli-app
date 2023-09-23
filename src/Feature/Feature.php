@@ -4,19 +4,20 @@ namespace BankingApp\Feature;
 
 use BankingApp\Management\Management;
 use BankingApp\Model\Role;
+use BankingApp\Model\User;
 use BankingApp\State\AuthenticationState;
 use BankingApp\Storage\Storage;
-use BankingApp\Traits\RepeatAskingInput;
 use BankingApp\View\View;
 
 abstract class Feature
 {
+    protected User $loggedInUser;
     public function __construct(protected AuthenticationState $authenticationState, protected Management $management, protected View $view, protected Storage $storage)
     {
     }
 
     /**
-     * @return array<Role>
+     * @return string
      */
     abstract function label(): string;
 
@@ -30,6 +31,7 @@ abstract class Feature
     function postRun(): void
     {
         printf("\n");
+        $this->storage->write(AuthenticationState::class, $this->authenticationState);
     }
 
     public function __toString(): string

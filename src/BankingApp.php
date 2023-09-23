@@ -2,11 +2,15 @@
 
 namespace BankingApp;
 
-use BankingApp\Feature\AddDeposit;
+use BankingApp\Feature\Deposit;
 use BankingApp\Feature\Feature;
 use BankingApp\Feature\Login;
 use BankingApp\Feature\Logout;
 use BankingApp\Feature\Register;
+use BankingApp\Feature\Transfer;
+use BankingApp\Feature\ViewTransactions;
+use BankingApp\Feature\ViewUsers;
+use BankingApp\Feature\Withdraw;
 use BankingApp\Management\Management;
 use BankingApp\Management\Managers\AccountsManager;
 use BankingApp\Management\Managers\FinanceManager;
@@ -68,23 +72,31 @@ class BankingApp
 
     private function loadFeatures(): void
     {
-        $this->loadFeature([Role::GUEST],1, Login::class);
-        $this->loadFeature([Role::GUEST],2, Register::class);
+        $this->loadFeature([1 => Role::GUEST], Login::class);
+        $this->loadFeature([2 => Role::GUEST], Register::class);
 
-        $this->loadFeature([Role::CUSTOMER],1, AddDeposit::class);
-        $this->loadFeature([Role::CUSTOMER, Role::ADMIN],9, Logout::class);
+        $this->loadFeature([1 => Role::CUSTOMER], Deposit::class);
+        $this->loadFeature([2 => Role::CUSTOMER], Withdraw::class);
+        $this->loadFeature([3 => Role::CUSTOMER], Transfer::class);
+
+        $this->loadFeature([1 => Role::ADMIN], ViewUsers::class);
+
+        $this->loadFeature([4 => Role::CUSTOMER, 2 => Role::ADMIN], ViewTransactions::class);
+        $this->loadFeature([5 => Role::CUSTOMER, 3 => Role::ADMIN], Logout::class);
     }
-    private function loadFeature(array $roles, int $key, string $featureClass): void
+
+    private function loadFeature(array $roles, string $featureClass): void
     {
-        foreach ($roles as $role) {
+        foreach ($roles as $key => $role) {
             $this->features[$role->name][$key] = new $featureClass($this->authenticationState, $this->management, $this->view, $this->storage);
         }
     }
+
     private function loadManagement(Storage $storage) : Management
     {
         $financeManager = $this->storage->load(FinanceManager::class) ?? new FinanceManager($storage);
         $accountsManager = $this->storage->load(AccountsManager::class) ?? new AccountsManager($storage);
-        return new Management($financeManager, $accountsManager);
+       return new Management($financeManager, $accountsManager);
     }
 
     private function loadAuthState(): AuthenticationState {
